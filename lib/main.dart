@@ -10,67 +10,69 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Ciclo de Vida de StatefulWidget'),
+      home: ParentWidget(),
+    );
+  }
+}
+
+class ParentWidget extends StatefulWidget {
+  @override
+  State<ParentWidget> createState() => _ParentWidgetState();
+}
+
+class _ParentWidgetState extends State<ParentWidget> {
+  String title = "Initial Title";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ChildWidget(title: title),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  title = "Updated Title";
+                });
+              },
+              child: const Text('Update Title'),
+            ),
+          ],
         ),
-        body: const LifeCycleExample(),
       ),
     );
   }
 }
 
-class LifeCycleExample extends StatefulWidget {
-  const LifeCycleExample({super.key});
+class ChildWidget extends StatefulWidget {
+  final String title;
+
+  const ChildWidget({super.key, required this.title});
 
   @override
-  State<LifeCycleExample> createState() => _LifeCycleExampleState();
+  State<ChildWidget> createState() => _ChildWidgetState();
 }
 
-class _LifeCycleExampleState extends State<LifeCycleExample> {
-  int counter = 0;
-
+class _ChildWidgetState extends State<ChildWidget> {
   @override
-  void initState() {
-    super.initState();
-    debugPrint('initState: El widget se ha inicializado.');
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    debugPrint(
-        'didChangeDependencies: Se han establecido dependencias del widget.');
+  void didUpdateWidget(covariant ChildWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.title != widget.title) {
+      debugPrint(
+          'Title changed from "${oldWidget.title}" to "${widget.title}"');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('build: Se está construyendo el widget.');
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          'Contador: $counter',
-          style: const TextStyle(fontSize: 24),
-        ),
-        const SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              counter++;
-              debugPrint('setState: El estado ha cambiado a $counter.');
-            });
-          },
-          child: const Text('Incrementar'),
-        ),
-      ],
+    return Text(
+      'Current Title: ${widget.title}',
+      style: const TextStyle(fontSize: 20),
     );
   }
-
-  @override
-  void dispose() {
-    debugPrint('dispose: El widget se está eliminando.');
-    super.dispose();
-  }
 }
-
